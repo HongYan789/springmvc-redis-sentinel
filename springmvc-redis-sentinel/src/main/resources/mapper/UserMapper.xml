@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper 
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.lppz.ehr.mapper.UserMapper">
+
+	<resultMap id="userMap" type="User">
+		<result property="id" column="pk_id" />
+		<result property="name" column="name" />
+		<result property="createTime" column="create_time" />
+	</resultMap>
+	
+    <insert id="insert" parameterType="User" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO t_user(`name`, `create_time`)
+		VALUES(#{name}, #{createTime})
+	</insert>
+	<select id="selectOne" parameterType="Map" resultMap="userMap">
+		SELECT * 
+		FROM t_user
+		WHERE pk_id = #{id}
+	</select>
+	
+	<select id="selectListByPage" parameterType="Map" resultMap="userMap">
+        SELECT * 
+        FROM t_user
+        order by pk_id desc
+        LIMIT #{limit}
+        OFFSET #{offset}
+    </select>
+    <select id="selectListByIds" parameterType="Map" resultMap="userMap">
+        SELECT * 
+        FROM t_user
+        WHERE pk_id IN
+	    <foreach item="item" index="index" collection="ids" open="(" separator="," close=")">
+	        #{item}
+	    </foreach>
+    </select>
+    <select id="countListByIds" parameterType="Map" resultType="Integer">
+        SELECT count(1)
+        FROM t_user
+        WHERE pk_id IN
+	    <foreach item="item" index="index" collection="ids" open="(" separator="," close=")">
+	        #{item}
+	    </foreach>
+    </select>
+	<update id="update" parameterType="User">
+		UPDATE t_user
+		SET `name` = #{name}
+		WHERE pk_id = #{id}
+	</update>
+
+	<delete id="delete" parameterType="Map">
+		delete from t_user
+		where pk_id = #{id}
+	</delete>
+	
+	<delete id="deleteAll">
+		delete from t_user
+    </delete>
+    
+    <update id="synData" parameterType="Map">
+    <!-- mysql 不支持该写法
+		update t_employee a set a.fk_ding_id=b.ding_id from t_ding b where a.job_no=b.job_no and b.job_no != ''
+	 -->	
+	<!-- mysql 支持以下2种写法 -->	
+	<!-- 	
+		受影响的行: 8839
+		时间: 253.770s 
+	-->
+		update t_employee a left join t_ding b on a.job_no=b.job_no set a.fk_ding_id=b.ding_id   where   b.job_no != ''
+	<!-- 	
+		受影响的行: 8839
+		时间: 256.768s
+	-->
+		<!-- 
+		update t_employee a , t_ding b set a.fk_ding_id=b.ding_id     where   a.job_no=b.job_no  and b.job_no != ''
+		 -->
+	</update>
+    
+</mapper>

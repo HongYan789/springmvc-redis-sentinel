@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper 
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.lppz.ehr.mapper.DingUserMapper">
+
+	<resultMap id="DingUserMap" type="DingUser">
+		<result property="id" column="id" />
+		<result property="userid" column="user_id" />
+		<result property="name" column="name" />
+		<result property="active" column="active" />
+		<result property="tel" column="tel" />
+		<result property="workPlace" column="work_place" />
+		<result property="remark" column="remark" />
+		<result property="mobile" column="mobile" />
+		<result property="email" column="email" />
+		<result property="orderInDepts" column="order_in_depts" />
+		<result property="isAdmin" column="is_admin" />
+		<result property="isBoss" column="is_boss" />
+		<result property="isLeaderInDepts" column="is_leader_in_depts" />
+		<result property="isHide" column="is_hide" />
+		<result property="department" column="department" />
+		<result property="position" column="position" />
+		<result property="avatar" column="avatar" />
+		<result property="jobnumber" column="jobnumber" />
+		<result property="extattr" column="extattr" />
+		<result property="senior" column="senior" />
+		<result property="sapid" column="sapid" />
+		<result property="initials" column="initials" />
+		<result property="namePinyin" column="name_pinyin" />
+	</resultMap>
+	<insert id="insert" parameterType="DingUser" useGeneratedKeys="true" keyProperty="id">
+	insert  into t_ding_user
+	(user_id,name,active,tel,work_place,remark,mobile,email,order_in_depts,is_admin,is_boss,is_leader_in_depts,is_hide,department,position,avatar,jobnumber,extattr,senior,sapid,initials,name_pinyin,update_time)
+	values
+	(#{userid},#{name},#{active},#{tel},#{workPlace},#{remark},#{mobile},#{email},#{orderInDepts},#{isAdmin},#{isBoss},#{isLeaderInDepts},#{isHide},#{department},#{position},#{avatar},#{jobnumber},#{extattr},#{senior},#{sapid},#{initials},#{namePinyin},now())
+	</insert>
+	<update id="update" parameterType="DingUser">
+	update  t_ding_user
+	set
+	<if test="userid!=null and userid!=''">
+	user_id=#{userid},
+	</if>
+	<if test="name!=null and name!=''">
+	name=#{name},
+	</if>
+	<if test="active!=null and active!=''">
+	active=#{active},
+	</if>
+	<if test="tel!=null and tel!=''">
+	tel=#{tel},
+	</if>
+	<if test="workPlace!=null and workPlace!=''">
+	work_place=#{workPlace},
+	</if>
+	<if test="remark!=null and remark!=''">
+	remark=#{remark},
+	</if>
+	<if test="mobile!=null and mobile!=''">
+	mobile=#{mobile},
+	</if>
+	<if test="email!=null and email!=''">
+	email=#{email},
+	</if>
+	<if test="orderInDepts!=null and orderInDepts!=''">
+	order_in_depts=#{orderInDepts},
+	</if>
+	<if test="isAdmin!=null and isAdmin!=''">
+	is_admin=#{isAdmin},
+	</if>
+	<if test="isBoss!=null and isBoss!=''">
+	is_boss=#{isBoss},
+	</if>
+	<if test="isLeaderInDepts!=null and isLeaderInDepts!=''">
+	is_leader_in_depts=#{isLeaderInDepts},
+	</if>
+	<if test="isHide!=null and isHide!=''">
+	is_hide=#{isHide},
+	</if>
+	<if test="department!=null and department!=''">
+	department=#{department},
+	</if>
+	<if test="position!=null and position!=''">
+	position=#{position},
+	</if>
+	<if test="avatar!=null and avatar!=''">
+	avatar=#{avatar},
+	</if>
+	<if test="jobnumber!=null and jobnumber!=''">
+	jobnumber=#{jobnumber},
+	</if>
+	<if test="extattr!=null and extattr!=''">
+	extattr=#{extattr},
+	</if>
+	<if test="senior!=null and senior!=''">
+	senior=#{senior},
+	</if>
+	<if test="sapid!=null and sapid!=''">
+	sapid=#{sapid},
+	</if>
+	<if test="initials!=null and initials!=''">
+	initials=#{initials},
+	</if>
+	<if test="namePinyin!=null and namePinyin!=''">
+	name_pinyin=#{namePinyin},
+	</if>
+	update_time=now()
+	where  jobnumber=#{jobnumber}
+	</update>
+	<select id="selectAllByDingid" parameterType="Map"  resultMap="DingUserMap">
+	select  * from  t_ding_user  where  jobnumber=#{jobnumber}
+	</select>
+	<select id="selectSapidByEmployee" parameterType="Map" resultType="java.util.Map">
+	select  sap_department_id as sapid from t_employee  where `job_no`=#{jobnumber} 
+	</select>
+	<select id="selectDeptBysapid" parameterType="Map" resultType="java.util.Map">
+	select  fk_sap_id as deptid,name,parent_sap_id as parentid,store_bs as store,`desc` as short from t_department  where fk_sap_id=#{sapid} and ob_type='O'
+	</select>
+	<select id="selectPDeptBysapid" parameterType="Map" resultType="java.util.Map">
+	select  fk_sap_id as deptid,parent_sap_id as parentid,name,store_bs as store,`desc` as short from t_department  where fk_sap_id=#{parentid} and ob_type='O'
+	</select>
+	<select id="selectSonDeptBysapid" parameterType="Map" resultType="java.util.Map">
+	select  fk_sap_id as deptid,name,parent_sap_id as parentid,store_bs as store,`desc` as short from t_department  where parent_sap_id=#{sapid} and ob_type='O'
+	</select>
+	<select id="selectDeptInfoByDescOrDeptName" parameterType="Map" resultType="java.util.Map">
+	SELECT  `name` ,fk_sap_id as deptid ,store_bs as store,`desc` as short,parent_sap_id as parentid FROM  t_department  WHERE  `name`  LIKE   CONCAT('%',#{keyword},'%' )  OR  `desc`  LIKE CONCAT('%',#{keyword},'%' )  and ob_type='O'
+	</select>
+	<!--搜索 根据员工姓名或工号模糊查询人员表中的姓名，工号，部门id,岗位id -->
+	<select id="selectPersonInfoByNameOrJobNo" parameterType="Map" resultType="java.util.Map">
+	SELECT  name,job_no as jobNo,sap_department_id as deptid,station_id as stationId  FROM  t_employee  WHERE (`name`  LIKE  CONCAT('%',#{keyword},'%' )  OR `job_no`=#{keyword}) and sap_state='3'
+	</select>
+	<select id="selectPersonInfoByJobNo" parameterType="Map" resultType="java.util.Map">
+	SELECT  `avatar`,`name`,`jobnumber`  FROM  t_ding_user  WHERE `jobnumber`=#{keyword}
+	</select>
+	<select id="selectPersonInfoBysapid" parameterType="Map" resultType="java.util.Map">
+	select
+	name,job_no as jobNo,sap_department_id as deptid,station_id as stationId
+	from t_employee 
+	where sap_department_id=#{sapid}  and sap_state=3
+	</select>
+	<!-- 搜头像 -->
+	<select id="selectAvatarByJobNo" parameterType="String" resultType="java.util.Map">
+	select avatar  from t_ding_user where jobnumber=#{jobNo} 
+	</select>
+	<!--根据人员表中的 岗位id station_id 也就是在部门表中部门id且ob_type=S的-->
+	<select id="selectPostByStationId" parameterType="String" resultType="java.util.Map">
+	select name  from t_department where fk_sap_id=#{stationId} and ob_type='S'
+	</select>
+</mapper>
